@@ -6,5 +6,6 @@
     <Device name="GW1NR-9C" pn="GW1NR-LV9QN88PC6/I5">gw1nr9c-004</Device>
     <FileList>
         <File path="../../RTL/main_top.v" type="file.verilog" enable="1"/>
+        <File path="../../Tang9k/GW1NR-LV9QN88P.cst" type="file.cst" enable="1"/>
     </FileList>
 </Project>
