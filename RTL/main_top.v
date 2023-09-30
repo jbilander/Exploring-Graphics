@@ -10,21 +10,25 @@ module main_top(
     input C27M,         // Input XTAL clock (27 MHz)
     input RESET_n,      // Push-button S2 on Tang9k, press down to reset
     output PCLK,        // Pixel-clock output
-    output PLOCK,       // Pixel-clock lock, indicates when Gowin rPLL generates a stable pixel-clock
     output HSYNC,       // A screen begins a new line when it receives a horizontal sync,
     output VSYNC,       //  and a new frame on a vertical sync
     output DE,          // Data enable. This signal is high when input pixel data is valid to the transmitter 
                         //  and low otherwise. It is critical that this signal have the same
                         //  setup/hold timing as the data bus.
-    output reg LED
+    output [4:0] RED,   // 5-bit DVI red
+    output [5:0] GREEN, // 6-bit DVI green
+    output [4:0] BLUE   // 5-bit DVI blue
+//    output reg LED
 );
+
+wire plock;             // Pixel-clock lock, indicates when Gowin rPLL generates a stable pixel-clock
 
 // generate pixel clock
 clock_480p pclk_480p(
     .C27M(C27M),
     .RESET_n(RESET_n),
     .PCLK(PCLK),        // The rPLL generated 25.2 MHz pixel clock for 480p@60 Hz
-    .PLOCK(PLOCK)
+    .PLOCK(plock)
 );
 
 localparam CORDW = 10;      // screen coordinate width in bits
@@ -32,7 +36,7 @@ wire [CORDW-1:0] sx, sy;    // screen coordinates
 
 simple_480p display_inst (
     .PCLK(PCLK),
-    .RST_PCLK(!PLOCK),   // wait for clock lock
+    .RST_PCLK(!plock),   // wait for clock lock
     .SX(sx),
     .SY(sy),
     .HSYNC(HSYNC),
@@ -40,7 +44,7 @@ simple_480p display_inst (
     .DE(DE)
 );
 
-
+/*
 reg [31:0] counter;
 
 always @ (negedge RESET_n or posedge PCLK) begin
@@ -61,5 +65,6 @@ always @ (negedge RESET_n or posedge PCLK) begin
     end
 
 end
+*/
 
 endmodule
