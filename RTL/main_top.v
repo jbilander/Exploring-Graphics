@@ -4,6 +4,7 @@ module main_top(
     input C27M,         // Input XTAL clock (27 MHz)
     input RESET_n,      // Push-button S2 on Tang9k, press down to reset
     output PCLK,        // Pixel-clock output
+    output PLOCK,       // Pixel-clock lock, indicates when Gowin rPLL generates a stable pixel-clock
     output HSYNC,       // A screen begins a new line when it receives a horizontal sync,
     output VSYNC,       // and a new frame on a vertical sync
     output reg LED
@@ -12,7 +13,8 @@ module main_top(
 clock_480p pclk_480p(
     .C27M(C27M),
     .RESET_n(RESET_n),
-    .PCLK(PCLK)         // The rPLL generated 25.2 MHz pixel clock for 480p@60 Hz
+    .PCLK(PCLK),        // The rPLL generated 25.2 MHz pixel clock for 480p@60 Hz
+    .PLOCK(PLOCK)
 );
 
 

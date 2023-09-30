@@ -4,16 +4,16 @@
 //GOWIN Version: V1.9.8.08
 //Part Number: GW1NR-LV9QN88PC6/I5
 //Device: GW1NR-9C
-//Created Time: Sat Sep 30 11:12:58 2023
+//Created Time: Sat Sep 30 12:10:30 2023
 
-module Gowin_rPLL_25M (clkout, clkoutd, reset, clkin);
+module Gowin_rPLL_25M (clkout, lock, clkoutd, reset, clkin);
 
 output clkout;
+output lock;
 output clkoutd;
 input reset;
 input clkin;
 
-wire lock_o;
 wire clkoutp_o;
 wire clkoutd3_o;
 wire gw_gnd;
@@ -22,7 +22,7 @@ assign gw_gnd = 1'b0;
 
 rPLL rpll_inst (
     .CLKOUT(clkout),
-    .LOCK(lock_o),
+    .LOCK(lock),
     .CLKOUTP(clkoutp_o),
     .CLKOUTD(clkoutd),
     .CLKOUTD3(clkoutd3_o),
