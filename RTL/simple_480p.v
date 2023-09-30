@@ -29,7 +29,7 @@ parameter VS_STA = VA_END + 10;   // sync starts after front porch
 parameter VS_END = VS_STA + 2;    // sync ends
 parameter SCREEN = 524;           // last line on screen (after back porch)
 
-
+// Negative polarity means that the active edge is a high-to-low transition.
 assign HSYNC = ~(SX >= HS_STA && SX < HS_END);  // invert: negative polarity
 assign VSYNC = ~(SY >= VS_STA && SY < VS_END);  // invert: negative polarity
 assign DE = (SX <= HA_END && SY <= VA_END);
