@@ -4,7 +4,7 @@
 //GOWIN Version: V1.9.8.08
 //Part Number: GW1NR-LV9QN88PC6/I5
 //Device: GW1NR-9C
-//Created Time: Thu Sep 28 12:46:57 2023
+//Created Time: Sat Sep 30 11:12:58 2023
 
 module Gowin_rPLL_25M (clkout, clkoutd, reset, clkin);
 
@@ -61,4 +61,4 @@ defparam rpll_inst.CLKOUTD_SRC = "CLKOUT";
 defparam rpll_inst.CLKOUTD3_SRC = "CLKOUT";
 defparam rpll_inst.DEVICE = "GW1NR-9C";
 
-endmodule //Gowin_rPLL
+endmodule //Gowin_rPLL_25M
