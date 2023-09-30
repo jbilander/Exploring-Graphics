@@ -7,6 +7,7 @@
     <FileList>
         <File path="../../RTL/main_top.v" type="file.verilog" enable="1"/>
 		<File path="../../RTL/gowin_rpll_25M.v" type="file.verilog" enable="1"/>
+		<File path="../../RTL/clock_480p.v" type="file.verilog" enable="1"/>
         <File path="../../Tang9k/GW1NR-LV9QN88P.cst" type="file.cst" enable="1"/>
     </FileList>
 </Project>
