@@ -41,17 +41,94 @@ simple_480p display_inst (
     .DE(DE)
 );
 
-assign square = (sx > 220 && sx < 420) && (sy > 140 && sy < 340);
 
-// paint colour: white inside square, blue outside
-wire [4:0] paint_r = square ? 5'hFF : 5'h1;
-wire [5:0] paint_g = square ? 6'hFF : 6'h3;
-wire [4:0] paint_b = square ? 5'hFF : 5'h5;
+reg [4:0] paint_r;
+reg [5:0] paint_g;
+reg [4:0] paint_b;
+
+always @*
+    if (sx < 256 && sy < 256) begin     // colour square in top-left 256x256 pixels
+        paint_g = sy[5:0];              // 64 vertical pixels of each green level
+        paint_b = sx[4:0];              // 32 horizontal pixels of each blue level
+
+        if (sx >= 0 && sx <= 31 && sy >= 0 && sy <= 63) begin
+            paint_r = 0;
+        end else if (sx >= 32 && sx <= 63 && sy >= 0 && sy <= 63) begin
+            paint_r = 1;
+        end else if (sx >= 64 && sx <= 95 && sy >= 0 && sy <= 63) begin
+            paint_r = 2;
+        end else if (sx >= 96 && sx <= 127 && sy >= 0 && sy <= 63) begin
+            paint_r = 3;
+        end else if (sx >= 128 && sx <= 159 && sy >= 0 && sy <= 63) begin
+            paint_r = 4;
+        end else if (sx >= 160 && sx <= 191 && sy >= 0 && sy <= 63) begin
+            paint_r = 5;
+        end else if (sx >= 192 && sx <= 223 && sy >= 0 && sy <= 63) begin
+            paint_r = 6;
+        end else if (sx >= 224 && sx <= 255 && sy >= 0 && sy <= 63) begin
+            paint_r = 7;
+        end else if (sx >= 0 && sx <= 31 && sy >= 64 && sy <= 127) begin
+            paint_r = 8;
+        end else if (sx >= 32 && sx <= 63 && sy >= 64 && sy <= 127) begin
+            paint_r = 9;
+        end else if (sx >= 64 && sx <= 95 && sy >= 64 && sy <= 127) begin
+            paint_r = 10;
+        end else if (sx >= 96 && sx <= 127 && sy >= 64 && sy <= 127) begin
+            paint_r = 11;
+        end else if (sx >= 128 && sx <= 159 && sy >= 64 && sy <= 127) begin
+            paint_r = 12;
+        end else if (sx >= 160 && sx <= 191 && sy >= 64 && sy <= 127) begin
+            paint_r = 13;
+        end else if (sx >= 192 && sx <= 223 && sy >= 64 && sy <= 127) begin
+            paint_r = 14;
+        end else if (sx >= 224 && sx <= 255 && sy >= 64 && sy <= 127) begin
+            paint_r = 15;
+        end else if (sx >= 0 && sx <= 31 && sy >= 128 && sy <= 191) begin
+            paint_r = 16;
+        end else if (sx >= 32 && sx <= 63 && sy >= 128 && sy <= 191) begin
+            paint_r = 17;
+        end else if (sx >= 64 && sx <= 95 && sy >= 128 && sy <= 191) begin
+            paint_r = 18;
+        end else if (sx >= 96 && sx <= 127 && sy >= 128 && sy <= 191) begin
+            paint_r = 19;
+        end else if (sx >= 128 && sx <= 159 && sy >= 128 && sy <= 191) begin
+            paint_r = 20;
+        end else if (sx >= 160 && sx <= 191 && sy >= 128 && sy <= 191) begin
+            paint_r = 21;
+        end else if (sx >= 192 && sx <= 223 && sy >= 128 && sy <= 191) begin
+            paint_r = 22;
+        end else if (sx >= 224 && sx <= 255 && sy >= 128 && sy <= 191) begin
+            paint_r = 23;
+        end else if (sx >= 0 && sx <= 31 && sy >= 192 && sy <= 255) begin
+            paint_r = 24;
+        end else if (sx >= 32 && sx <= 63 && sy >= 192 && sy <= 255) begin
+            paint_r = 25;
+        end else if (sx >= 64 && sx <= 95 && sy >= 192 && sy <= 255) begin
+            paint_r = 26;
+        end else if (sx >= 96 && sx <= 127 && sy >= 192 && sy <= 255) begin
+            paint_r = 27;
+        end else if (sx >= 128 && sx <= 159 && sy >= 192 && sy <= 255) begin
+            paint_r = 28;
+        end else if (sx >= 160 && sx <= 191 && sy >= 192 && sy <= 255) begin
+            paint_r = 29;
+        end else if (sx >= 192 && sx <= 223 && sy >= 192 && sy <= 255) begin
+            paint_r = 30;
+        end else if (sx >= 224 && sx <= 255 && sy >= 192 && sy <= 255) begin
+            paint_r = 31;
+        end else begin
+            paint_r = 0;
+        end
+
+    end else begin  // background colour
+        paint_r = 5'h00;
+        paint_g = 6'h00;
+        paint_b = 5'h00;
+    end
 
 // display colour: paint colour but black in blanking interval
-wire [4:0] display_r = DE ? paint_r : 5'h0;
-wire [5:0] display_g = DE ? paint_g : 6'h0;
-wire [4:0] display_b = DE ? paint_b : 5'h0;
+wire [4:0] display_r = DE ? paint_r : 5'h00;
+wire [5:0] display_g = DE ? paint_g : 6'h00;
+wire [4:0] display_b = DE ? paint_b : 5'h00;
 
 //Pmod output
 always @(posedge PCLK) begin
