@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "esp_timer.h"
+#include "esp_lcd_panel_ops.h"
 #include "driver/gpio.h"
+#include "esp_err.h"
 #include "esp_log.h"
 #include "esp_lcd_panel_rgb.h"
+#include "lvgl.h"
 
 static const char *TAG = "RGB_LCD";
 static uint8_t s_led_state = 0;
@@ -37,10 +42,30 @@ static uint8_t s_led_state = 0;
 // FrameBuffer
 #define LCD_NUM_FB 2 // allocate double frame buffer, Maximum number of buffers are 3
 
+static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
+static lv_disp_drv_t disp_drv;      // contains callback functions
+
+static SemaphoreHandle_t lvgl_mux;
+// we use two semaphores to sync the VSYNC event and the LVGL task, to avoid potential tearing effect
+static SemaphoreHandle_t sem_vsync_end;
+static SemaphoreHandle_t sem_gui_ready;
+
 static void configure_led(void)
 {
     gpio_reset_pin(GPIO_NUM_38);
     gpio_set_direction(GPIO_NUM_38, GPIO_MODE_OUTPUT);
+}
+
+static bool example_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data)
+{
+    BaseType_t high_task_awoken = pdFALSE;
+
+    if (xSemaphoreTakeFromISR(sem_gui_ready, &high_task_awoken) == pdTRUE)
+    {
+        xSemaphoreGiveFromISR(sem_vsync_end, &high_task_awoken);
+    }
+
+    return high_task_awoken == pdTRUE;
 }
 
 static void configure_rgb_lcd(void)
@@ -61,6 +86,7 @@ static void configure_rgb_lcd(void)
                     .vsync_front_porch = 4},
         .data_width = 16, // RGB565 in parallel mode, thus 16-bit in width
         .num_fbs = LCD_NUM_FB,
+        .psram_trans_align = 64,
         .hsync_gpio_num = PIN_NUM_HSYNC,
         .vsync_gpio_num = PIN_NUM_VSYNC,
         .de_gpio_num = PIN_NUM_DE,
@@ -69,10 +95,23 @@ static void configure_rgb_lcd(void)
         .data_gpio_nums = {PIN_NUM_DATA0, PIN_NUM_DATA1, PIN_NUM_DATA2, PIN_NUM_DATA3, PIN_NUM_DATA4, PIN_NUM_DATA5, PIN_NUM_DATA6, PIN_NUM_DATA7, PIN_NUM_DATA8, PIN_NUM_DATA9, PIN_NUM_DATA10, PIN_NUM_DATA11, PIN_NUM_DATA12, PIN_NUM_DATA13, PIN_NUM_DATA14, PIN_NUM_DATA15},
         .flags = {.fb_in_psram = true}};
     ESP_ERROR_CHECK(esp_lcd_new_rgb_panel(&panel_config, &panel_handle));
+
+    ESP_LOGI(TAG, "Register event callbacks");
+    esp_lcd_rgb_panel_event_callbacks_t cbs = {
+        .on_vsync = example_on_vsync_event,
+    };
+    ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(panel_handle, &cbs, &disp_drv));
 }
 
 extern "C" void app_main()
 {
+
+    ESP_LOGI(TAG, "Create semaphores");
+    sem_vsync_end = xSemaphoreCreateBinary();
+    assert(sem_vsync_end);
+    sem_gui_ready = xSemaphoreCreateBinary();
+    assert(sem_gui_ready);
+
     configure_rgb_lcd();
     configure_led();
 
