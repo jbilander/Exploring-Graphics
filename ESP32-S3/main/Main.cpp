@@ -4,10 +4,10 @@
 #include "freertos/semphr.h"
 #include "esp_timer.h"
 #include "esp_lcd_panel_ops.h"
+#include "esp_lcd_panel_rgb.h"
 #include "driver/gpio.h"
 #include "esp_err.h"
 #include "esp_log.h"
-#include "esp_lcd_panel_rgb.h"
 #include "lvgl.h"
 
 #define LCD_PIXEL_CLOCK_HZ (18 * 1000 * 1000)
@@ -44,6 +44,8 @@
 #define LVGL_TASK_MIN_DELAY_MS 1
 #define LVGL_TASK_STACK_SIZE (4 * 1024)
 #define LVGL_TASK_PRIORITY 2
+
+extern "C" void lvgl_demo_ui(lv_disp_t *disp);
 
 static const char *TAG = "RGB_LCD";
 static uint8_t s_led_state = 0;
@@ -227,8 +229,7 @@ extern "C" void app_main()
     // Lock the mutex due to the LVGL APIs are not thread-safe
     if (lvgl_lock(-1))
     {
-
-        // lvgl_demo_ui(disp);
+        lvgl_demo_ui(disp);
 
         // Release the mutex
         lvgl_unlock();
