@@ -10,7 +10,7 @@
 #include "esp_log.h"
 #include "lvgl.h"
 
-#define LCD_PIXEL_CLOCK_HZ (18 * 1000 * 1000)
+#define LCD_PIXEL_CLOCK_HZ (25 * 1000 * 1000)
 #define PIN_NUM_HSYNC 1   // New Line
 #define PIN_NUM_VSYNC 2   // New Frame
 #define PIN_NUM_DE 48     // Data Enable On/Off
@@ -33,7 +33,7 @@
 #define PIN_NUM_DATA15 8  // R4
 
 // The pixel number in horizontal and vertical
-#define LCD_H_RES 800
+#define LCD_H_RES 640
 #define LCD_V_RES 480
 
 // FrameBuffer
@@ -147,12 +147,12 @@ static void init_rgb_lcd(void)
                     .pclk_hz = LCD_PIXEL_CLOCK_HZ,
                     .h_res = LCD_H_RES,
                     .v_res = LCD_V_RES,
-                    .hsync_pulse_width = 1,
-                    .hsync_back_porch = 40,
-                    .hsync_front_porch = 20,
-                    .vsync_pulse_width = 1,
-                    .vsync_back_porch = 8,
-                    .vsync_front_porch = 4},
+                    .hsync_pulse_width = 96,
+                    .hsync_back_porch = 48,
+                    .hsync_front_porch = 16,
+                    .vsync_pulse_width = 2,
+                    .vsync_back_porch = 33,
+                    .vsync_front_porch = 10},
         .data_width = 16, // RGB565 in parallel mode, thus 16-bit in width
         .num_fbs = LCD_NUM_FB,
         .psram_trans_align = 64,
