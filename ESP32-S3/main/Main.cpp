@@ -56,7 +56,7 @@ static void configure_led(void)
     gpio_set_direction(GPIO_NUM_38, GPIO_MODE_OUTPUT);
 }
 
-static bool example_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data)
+static bool on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data)
 {
     BaseType_t high_task_awoken = pdFALSE;
 
@@ -68,7 +68,7 @@ static bool example_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_r
     return high_task_awoken == pdTRUE;
 }
 
-static void configure_rgb_lcd(void)
+static void init_rgb_lcd(void)
 {
     ESP_LOGI(TAG, "Install RGB LCD panel driver");
     esp_lcd_panel_handle_t panel_handle = NULL;
@@ -98,9 +98,13 @@ static void configure_rgb_lcd(void)
 
     ESP_LOGI(TAG, "Register event callbacks");
     esp_lcd_rgb_panel_event_callbacks_t cbs = {
-        .on_vsync = example_on_vsync_event,
+        .on_vsync = on_vsync_event
     };
     ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(panel_handle, &cbs, &disp_drv));
+
+    ESP_LOGI(TAG, "Initialize RGB LCD panel");
+    ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));
+    ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle));
 }
 
 extern "C" void app_main()
@@ -112,7 +116,7 @@ extern "C" void app_main()
     sem_gui_ready = xSemaphoreCreateBinary();
     assert(sem_gui_ready);
 
-    configure_rgb_lcd();
+    init_rgb_lcd();
     configure_led();
 
     while (1)
